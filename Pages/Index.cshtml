@@ -1,0 +1,138 @@
+﻿@page
+@using BeautySalon
+@model IndexModel
+@{
+    var text = Localization.For(HttpContext);
+    ViewData["Title"] = text.Title;
+}
+
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <p class="eyebrow">@text.HeroEyebrow</p>
+            <h1>@text.HeroTitle</h1>
+            <p class="hero-text">@text.HeroText</p>
+            <div class="hero-actions">
+                <a class="btn btn-dark btn-lg" href="#booking">@text.HeroBook</a>
+                <a class="btn btn-outline-dark btn-lg" href="#services">@text.HeroServices</a>
+            </div>
+        </div>
+        <div class="hero-panel" aria-label="@text.Title">
+            <div>
+                <span class="hero-number">4.9</span>
+                <span class="hero-label">@text.HeroRating</span>
+            </div>
+            <div>
+                <span class="hero-number">8</span>
+                <span class="hero-label">@text.HeroMasters</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="services">
+    <div class="container">
+        <div class="section-heading">
+            <p class="eyebrow">@text.PriceEyebrow</p>
+            <h2>@text.PopularServices</h2>
+        </div>
+        <div class="service-grid">
+            @foreach (var service in Model.Services)
+            {
+                <article class="service-card">
+                    <div class="service-icon">@service.Icon</div>
+                    <h3>@Localization.ServiceName(service.Name, text.Language)</h3>
+                    <p>@Localization.ServiceDescription(service.Description, text.Language)</p>
+                    <div class="service-meta">
+                        <span>@Localization.Duration(service.Duration, text.Language)</span>
+                        <strong>@service.Price</strong>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section section-muted" id="masters">
+    <div class="container">
+        <div class="section-heading">
+            <p class="eyebrow">@text.TeamEyebrow</p>
+            <h2>@text.SalonMasters</h2>
+        </div>
+        <div class="master-grid">
+            @foreach (var master in Model.Masters)
+            {
+                <article class="master-card">
+                    <div class="master-photo">@master.Initials</div>
+                    <h3>@master.Name</h3>
+                    <p>@Localization.MasterRole(master.Role, text.Language)</p>
+                    <span>@Localization.Experience(master.Experience, text.Language)</span>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section booking-section" id="booking">
+    <div class="container booking-grid">
+        <div>
+            <p class="eyebrow">@text.BookingEyebrow</p>
+            <h2>@text.BookingTitle</h2>
+            <p class="booking-copy">@text.BookingCopy</p>
+            <div class="contact-box">
+                <strong>@text.Schedule</strong>
+                <span>@text.MondaySaturday</span>
+                <span>@text.Sunday</span>
+            </div>
+        </div>
+
+        <form method="post" class="booking-form">
+            @if (Model.IsSubmitted)
+            {
+                <div class="alert alert-success" role="alert">
+                    @text.BookingSuccess
+                </div>
+            }
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Booking.Name" class="form-label">@text.Name</label>
+                    <input asp-for="Booking.Name" class="form-control" />
+                    <span asp-validation-for="Booking.Name" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Booking.Phone" class="form-label">@text.Phone</label>
+                    <input asp-for="Booking.Phone" class="form-control" inputmode="numeric" maxlength="12" pattern="\d{12}" placeholder="770012345678" />
+                    <span asp-validation-for="Booking.Phone" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Booking.Service" class="form-label">@text.Service</label>
+                    <select asp-for="Booking.Service" class="form-select">
+                        <option value="">@text.ChooseService</option>
+                        @foreach (var service in Model.Services)
+                        {
+                            <option value="@Localization.ServiceName(service.Name, text.Language)">@Localization.ServiceName(service.Name, text.Language)</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Booking.Service" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Booking.Date" class="form-label">@text.Date</label>
+                    <input asp-for="Booking.Date" class="form-control" />
+                    <span asp-validation-for="Booking.Date" class="text-danger"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Booking.Comment" class="form-label">@text.Comment</label>
+                    <textarea asp-for="Booking.Comment" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-dark btn-lg w-100">@text.SendRequest</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,171 @@
+@page
+@using BeautySalon
+@model AdminModel
+@{
+    var text = Localization.For(HttpContext);
+    ViewData["Title"] = text.NavAdmin;
+}
+
+<section class="section admin-section">
+    <div class="container">
+        <div class="section-heading">
+            <p class="eyebrow">@text.Management</p>
+            <h1 class="admin-title">@text.AdminTitle</h1>
+        </div>
+
+        @if (!Model.IsAdmin)
+        {
+            <form method="post" asp-page-handler="Login" class="booking-form admin-login">
+                <div class="mb-3">
+                    <label asp-for="Login.AccessCode" class="form-label">@text.AccessCode</label>
+                    <input asp-for="Login.AccessCode" class="form-control" type="password" autocomplete="current-password" />
+                    <span asp-validation-for="Login.AccessCode" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-dark btn-lg w-100">@text.Login</button>
+            </form>
+        }
+        else
+        {
+            @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+            {
+                <div class="alert alert-success" role="alert">@Model.StatusMessage</div>
+            }
+
+            <div class="admin-toolbar">
+                <span>@text.LoggedIn</span>
+                <form method="post" asp-page-handler="Logout">
+                    <button type="submit" class="btn btn-outline-dark">@text.Logout</button>
+                </form>
+            </div>
+
+            <div class="admin-grid">
+                <form method="post" asp-page-handler="AddService" class="booking-form">
+                    <h2 class="admin-panel-title">@text.NewService</h2>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="NewService.Name" class="form-label">@text.ServiceName</label>
+                            <input asp-for="NewService.Name" class="form-control" />
+                            <span asp-validation-for="NewService.Name" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NewService.Price" class="form-label">@text.Price</label>
+                            <input asp-for="NewService.Price" class="form-control" placeholder="от 10 000 ₸" />
+                            <span asp-validation-for="NewService.Price" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NewService.Duration" class="form-label">@text.Duration</label>
+                            <input asp-for="NewService.Duration" class="form-control" placeholder="60 мин" />
+                            <span asp-validation-for="NewService.Duration" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NewService.Icon" class="form-label">@text.Icon</label>
+                            <input asp-for="NewService.Icon" class="form-control" maxlength="2" placeholder="◆" />
+                            <span asp-validation-for="NewService.Icon" class="text-danger"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="NewService.Description" class="form-label">@text.Description</label>
+                            <textarea asp-for="NewService.Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="NewService.Description" class="text-danger"></span>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-dark w-100">@text.AddService</button>
+                        </div>
+                    </div>
+                </form>
+
+                <form method="post" asp-page-handler="AddMaster" class="booking-form">
+                    <h2 class="admin-panel-title">@text.NewMaster</h2>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="NewMaster.Name" class="form-label">@text.MasterName</label>
+                            <input asp-for="NewMaster.Name" class="form-control" />
+                            <span asp-validation-for="NewMaster.Name" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NewMaster.Role" class="form-label">@text.Role</label>
+                            <input asp-for="NewMaster.Role" class="form-control" />
+                            <span asp-validation-for="NewMaster.Role" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NewMaster.Experience" class="form-label">@text.Experience</label>
+                            <input asp-for="NewMaster.Experience" class="form-control" placeholder="5 лет опыта" />
+                            <span asp-validation-for="NewMaster.Experience" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NewMaster.Initials" class="form-label">@text.Initials</label>
+                            <input asp-for="NewMaster.Initials" class="form-control" maxlength="3" placeholder="АК" />
+                            <span asp-validation-for="NewMaster.Initials" class="text-danger"></span>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-dark w-100">@text.AddMaster</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="admin-list">
+                <h2 class="admin-panel-title">@text.ClientRequests</h2>
+                @if (Model.BookingLeads.Count == 0)
+                {
+                    <p class="admin-empty">@text.NoRequests</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle admin-table">
+                            <thead>
+                                <tr>
+                                    <th>@text.Client</th>
+                                    <th>@text.Service</th>
+                                    <th>@text.Date</th>
+                                    <th>@text.Comment</th>
+                                    <th>@text.Status</th>
+                                    <th>@text.Contact</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var lead in Model.BookingLeads)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@lead.Name</strong>
+                                            <span>@lead.Phone</span>
+                                        </td>
+                                        <td>@lead.Service</td>
+                                        <td>@lead.Date.ToString("dd.MM.yyyy")</td>
+                                        <td>@lead.Comment</td>
+                                        <td>
+                                            <form method="post" asp-page-handler="ToggleAgreed" class="lead-status-form">
+                                                <input type="hidden" name="id" value="@lead.Id" />
+                                                <input type="hidden" name="isAgreed" value="false" />
+                                                <input class="form-check-input" type="checkbox" name="isAgreed" value="true" checked="@lead.IsAgreed" onchange="this.form.submit()" id="lead-agreed-@lead.Id" />
+                                                <label class="form-check-label" for="lead-agreed-@lead.Id">@text.Agreed</label>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <div class="lead-actions">
+                                                <a class="btn btn-outline-dark btn-sm" href="tel:+@lead.Phone">@text.Call</a>
+                                                <a class="btn btn-dark btn-sm" href="https://wa.me/@lead.Phone" target="_blank" rel="noreferrer">WhatsApp</a>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <form method="post" asp-page-handler="DeleteLead">
+                                                <input type="hidden" name="id" value="@lead.Id" />
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">@text.Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
